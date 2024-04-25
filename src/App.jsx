@@ -25,6 +25,11 @@ export const App = () => {
 
   const TABLE_HEADERS = ['ID', 'Product', 'Category', 'User'];
 
+  const resetFilters = () => {
+    setFilterByOwner('All');
+    setSearcQuerry('');
+  };
+
   return (
     <div className="section">
       <div className="container">
@@ -98,6 +103,7 @@ export const App = () => {
               <a
                 data-cy="ResetAllButton"
                 href="#/"
+                onClick={() => resetFilters()}
                 className="button is-link is-outlined is-fullwidth"
               >
                 Reset all filters
@@ -108,7 +114,8 @@ export const App = () => {
 
         <div className="box table-container">
           <p data-cy="NoMatchingMessage">
-            No products matching selected criteria
+            {filteredProducts.length === 0 &&
+              'No products matching selected criteria'}
           </p>
 
           <table
