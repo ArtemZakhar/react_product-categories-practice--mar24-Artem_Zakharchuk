@@ -7,6 +7,7 @@ import categoriesFromServer from './api/categories';
 import productsFromServer from './api/products';
 import { Product } from './components/Products';
 import { filter } from './helpers/filter';
+import { OwnerFilter } from './components/OwnerFilter/OwnerFilter';
 
 const products = productsFromServer.map(product => {
   const category = categoriesFromServer.find(
@@ -19,7 +20,8 @@ const products = productsFromServer.map(product => {
 
 export const App = () => {
   const [filterByOwner, setFilterByOwner] = useState('All');
-  const filteredProducts = filter(products, { filterByOwner });
+  const [searchQuerry, setSearcQuerry] = useState('');
+  const filteredProducts = filter(products, { filterByOwner, searchQuerry });
 
   const TABLE_HEADERS = ['ID', 'Product', 'Category', 'User'];
 
@@ -32,35 +34,11 @@ export const App = () => {
           <nav className="panel">
             <p className="panel-heading">Filters</p>
 
-            <p className="panel-tabs has-text-weight-bold">
-              <a
-                data-cy="FilterAllUsers"
-                href="#/"
-                {...(filterByOwner === 'All' && {
-                  className: 'is-active',
-                })}
-                onClick={() => setFilterByOwner('All')}
-              >
-                All
-              </a>
-              {usersFromServer.map(serverUser => (
-                <a
-                  data-cy="FilterUser"
-                  href="#/"
-                  key={serverUser.id}
-                  {...(serverUser.name === filterByOwner && {
-                    className: 'is-active',
-                  })}
-                  onClick={() => setFilterByOwner(serverUser.name)}
-                >
-                  {serverUser.name}
-                </a>
-              ))}
-
-              {/* <a data-cy="FilterUser" href="#/" className="is-active">
-                User 2
-              </a> */}
-            </p>
+            <OwnerFilter
+              users={usersFromServer}
+              filter={filterByOwner}
+              onFilterChange={setFilterByOwner}
+            />
 
             <div className="panel-block">
               <p className="control has-icons-left has-icons-right">
@@ -69,7 +47,8 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
+                  value={searchQuerry}
+                  onChange={event => setSearcQuerry(event.target.value)}
                 />
 
                 <span className="icon is-left">
@@ -78,11 +57,14 @@ export const App = () => {
 
                 <span className="icon is-right">
                   {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-                  <button
-                    data-cy="ClearButton"
-                    type="button"
-                    className="delete"
-                  />
+                  {searchQuerry && (
+                    <button
+                      data-cy="ClearButton"
+                      type="button"
+                      className="delete"
+                      onClick={() => setSearcQuerry('')}
+                    />
+                  )}
                 </span>
               </p>
             </div>
