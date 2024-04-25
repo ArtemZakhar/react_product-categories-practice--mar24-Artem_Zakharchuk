@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './App.scss';
 
 import usersFromServer from './api/users';
@@ -23,6 +23,7 @@ export const App = () => {
     const { title } = elem;
 
     if (!(title in acc)) {
+      // eslint-disable-next-line no-param-reassign
       acc[title] = false;
     }
 
@@ -109,7 +110,7 @@ export const App = () => {
                 href="#/"
                 data-cy="AllCategories"
                 onClick={() => resetCategorySearch()}
-                className="button is-success mr-6 is-outlined"
+                className={`button is-success mr-6  ${Object.values(categorySearch).some(value => value) && 'is-outlined'}`}
               >
                 All
               </a>
