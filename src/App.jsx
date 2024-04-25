@@ -1,11 +1,12 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
-import React from 'react';
+import React, { useState } from 'react';
 import './App.scss';
 
 import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
 import productsFromServer from './api/products';
 import { Product } from './components/Products';
+import { filter } from './helpers/filter';
 
 const products = productsFromServer.map(product => {
   const category = categoriesFromServer.find(
@@ -17,7 +18,8 @@ const products = productsFromServer.map(product => {
 });
 
 export const App = () => {
-  console.log(products);
+  const [filterByOwner, setFilterByOwner] = useState('All');
+  const filteredProducts = filter(products, { filterByOwner });
 
   const TABLE_HEADERS = ['ID', 'Product', 'Category', 'User'];
 
@@ -31,11 +33,26 @@ export const App = () => {
             <p className="panel-heading">Filters</p>
 
             <p className="panel-tabs has-text-weight-bold">
-              <a data-cy="FilterAllUsers" href="#/">
+              <a
+                data-cy="FilterAllUsers"
+                href="#/"
+                {...(filterByOwner === 'All' && {
+                  className: 'is-active',
+                })}
+                onClick={() => setFilterByOwner('All')}
+              >
                 All
               </a>
               {usersFromServer.map(serverUser => (
-                <a data-cy="FilterUser" href="#/" key={serverUser.id}>
+                <a
+                  data-cy="FilterUser"
+                  href="#/"
+                  key={serverUser.id}
+                  {...(serverUser.name === filterByOwner && {
+                    className: 'is-active',
+                  })}
+                  onClick={() => setFilterByOwner(serverUser.name)}
+                >
                   {serverUser.name}
                 </a>
               ))}
@@ -167,7 +184,7 @@ export const App = () => {
             </thead>
 
             <tbody>
-              {products.map(product => (
+              {filteredProducts.map(product => (
                 <Product product={product} key={product.id} />
               ))}
             </tbody>
