@@ -1,4 +1,7 @@
-export const filter = (products, { filterByOwner, searchQuerry }) => {
+export const filter = (
+  products,
+  { filterByOwner, searchQuerry, categorySearch },
+) => {
   let copyProducts = [...products];
 
   switch (filterByOwner) {
@@ -21,6 +24,20 @@ export const filter = (products, { filterByOwner, searchQuerry }) => {
 
       return normalizeName.includes(normalizeSearh);
     });
+  }
+
+  if (categorySearch) {
+    const showCategoryArr = Object.entries(categorySearch)
+      .filter(([key, value]) => !value && key)
+      .map(item => item[0]);
+
+    const allCatLength = Object.keys(categorySearch).length;
+
+    if (showCategoryArr.length < allCatLength) {
+      copyProducts = copyProducts.filter(
+        product => !showCategoryArr.includes(product.category.title),
+      );
+    }
   }
 
   return copyProducts;

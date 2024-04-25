@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.scss';
 
 import usersFromServer from './api/users';
@@ -19,15 +19,45 @@ const products = productsFromServer.map(product => {
 });
 
 export const App = () => {
-  const [filterByOwner, setFilterByOwner] = useState('All');
+  const initialCatecoriesState = categoriesFromServer.reduce((acc, elem) => {
+    const { title } = elem;
+
+    if (!(title in acc)) {
+      acc[title] = false;
+    }
+
+    return acc;
+  }, {});
+
   const [searchQuerry, setSearcQuerry] = useState('');
-  const filteredProducts = filter(products, { filterByOwner, searchQuerry });
+  const [filterByOwner, setFilterByOwner] = useState('All');
+  const [categorySearch, setCategorySearc] = useState(initialCatecoriesState);
+
+  const filteredProducts = filter(products, {
+    filterByOwner,
+    searchQuerry,
+    categorySearch,
+  });
 
   const TABLE_HEADERS = ['ID', 'Product', 'Category', 'User'];
 
   const resetFilters = () => {
     setFilterByOwner('All');
     setSearcQuerry('');
+    resetCategorySearch();
+  };
+
+  const handleCategorySearch = categoryName => {
+    setCategorySearc(prevState => {
+      return {
+        ...prevState,
+        [categoryName]: !prevState[categoryName],
+      };
+    });
+  };
+
+  const resetCategorySearch = () => {
+    setCategorySearc(initialCatecoriesState);
   };
 
   return (
@@ -78,6 +108,7 @@ export const App = () => {
               <a
                 href="#/"
                 data-cy="AllCategories"
+                onClick={() => resetCategorySearch()}
                 className="button is-success mr-6 is-outlined"
               >
                 All
@@ -86,17 +117,14 @@ export const App = () => {
               {categoriesFromServer.map(serverCategory => (
                 <a
                   data-cy="Category"
-                  className="button mr-2 my-1 is-info"
+                  className={`button mr-2 my-1 ${categorySearch[serverCategory.title] && 'is-info'}`}
                   href="#/"
                   key={serverCategory.id}
+                  onClick={() => handleCategorySearch(serverCategory.title)}
                 >
                   {serverCategory.title}
                 </a>
               ))}
-
-              <a data-cy="Category" className="button mr-2 my-1" href="#/">
-                Category 2
-              </a>
             </div>
 
             <div className="panel-block">
